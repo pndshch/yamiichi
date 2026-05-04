@@ -4,39 +4,46 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>ヤミイチ | Pinda Lab</title>
-<meta name="description" content="戦後闇市の屋台主になれ！客の注文をドラッグで捌く3Dショップシム。60秒で何円稼げる？">
+<meta name="description" content="戦後闇市の屋台主になれ！客の注文をさばく3Dショップシム。60秒で何円稼げる？">
 <meta property="og:title" content="ヤミイチ — Yamiichi">
-<meta property="og:description" content="Drag the right item to each customer. 60-second black-market stall sim.">
+<meta property="og:description" content="Tap the right item, then tap the customer. 60-second black-market stall sim.">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{width:100%;height:100%;overflow:hidden;background:#1a0a0a;color:#fecaca;font-family:'Hiragino Maru Gothic ProN',system-ui,sans-serif;user-select:none}
-#scene{position:fixed;inset:0;cursor:grab}
-#scene.dragging{cursor:grabbing}
-.hud{position:fixed;top:12px;left:12px;right:12px;display:flex;justify-content:space-between;pointer-events:none;z-index:5;gap:10px;flex-wrap:wrap}
-.badge{background:rgba(0,0,0,0.65);border:1px solid #fb7185;border-radius:10px;padding:8px 14px;backdrop-filter:blur(6px)}
-.badge .lbl{font-size:10px;color:#fb7185;letter-spacing:1px;text-transform:uppercase;font-family:system-ui,sans-serif}
-.badge .val{font-size:22px;font-weight:800;font-variant-numeric:tabular-nums;color:#fecaca}
-.combo{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);font-size:42px;font-weight:900;color:#facc15;text-shadow:0 0 16px #fb7185;opacity:0;transition:opacity .2s, top .4s;pointer-events:none;z-index:8}
-.combo.show{opacity:1;top:42%}
-.help{position:fixed;bottom:14px;left:0;right:0;text-align:center;color:#fecaca;font-size:13px;pointer-events:none;z-index:5;opacity:0.85;padding:0 20px}
-.banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(13,17,23,0.95);border:2px solid #fb7185;border-radius:16px;padding:24px 32px;text-align:center;z-index:20;min-width:280px;max-width:90vw}
-.banner .big{font-size:36px;font-weight:900;color:#fb7185}
-.banner .label{font-size:12px;color:#fda4af;letter-spacing:2px;text-transform:uppercase;font-family:system-ui,sans-serif;margin-bottom:6px}
-.banner .small{font-size:13px;color:#a8b3c4;margin-top:8px;line-height:1.6}
-.banner .stats{display:flex;justify-content:space-around;margin:14px 0;gap:18px}
-.banner .stats div{font-size:11px;color:#fda4af;letter-spacing:1px}
-.banner .stats div b{display:block;font-size:22px;color:#fecaca;font-weight:900;margin-top:2px}
-.banner button{margin-top:14px;background:#fb7185;color:#1a0a0a;border:none;padding:10px 28px;border-radius:8px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
+html,body{width:100%;height:100%;overflow:hidden;background:#4a3228;color:#fef3c7;font-family:'Hiragino Maru Gothic ProN',system-ui,sans-serif;user-select:none}
+#scene{position:fixed;inset:0}
+.hud{position:fixed;top:10px;left:10px;right:10px;display:flex;justify-content:space-between;pointer-events:none;z-index:5;gap:8px}
+.badge{background:rgba(0,0,0,0.55);border:1px solid #f59e0b;border-radius:10px;padding:6px 12px;backdrop-filter:blur(6px)}
+.badge .lbl{font-size:10px;color:#f59e0b;letter-spacing:1px;text-transform:uppercase;font-family:system-ui,sans-serif}
+.badge .val{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:#fef3c7}
+.combo{position:fixed;top:45%;left:50%;transform:translate(-50%,-50%);font-size:38px;font-weight:900;color:#facc15;text-shadow:0 2px 12px rgba(0,0,0,0.6);opacity:0;transition:opacity .2s,transform .3s;pointer-events:none;z-index:8}
+.combo.show{opacity:1;transform:translate(-50%,-60%)}
+.timer-bar{position:fixed;top:56px;left:50%;transform:translateX(-50%);width:min(240px,70vw);height:6px;background:rgba(245,158,11,0.2);border:1px solid #f59e0b;border-radius:3px;overflow:hidden;z-index:5}
+.timer-bar-fill{height:100%;background:linear-gradient(90deg,#f59e0b,#ef4444);width:100%;transition:width .25s}
+.timer-label{position:fixed;top:43px;left:50%;transform:translateX(-50%);font-size:9px;color:#fbbf24;letter-spacing:2px;text-transform:uppercase;font-family:system-ui,sans-serif;z-index:5}
+
+/* Item bar */
+.item-bar{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:4px;padding:10px 6px 14px;background:linear-gradient(0deg,rgba(30,20,14,0.95) 60%,transparent);z-index:6;pointer-events:auto}
+.item-btn{width:62px;height:72px;border:2px solid #92400e;border-radius:12px;background:rgba(120,80,40,0.5);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:transform .1s,border-color .1s,background .1s;touch-action:manipulation;gap:2px}
+.item-btn .emoji{font-size:28px;line-height:1}
+.item-btn .price{font-size:10px;color:#fbbf24;font-weight:700;font-family:system-ui,sans-serif}
+.item-btn.selected{border-color:#facc15;background:rgba(250,204,21,0.25);transform:scale(1.12);box-shadow:0 0 16px rgba(250,204,21,0.4)}
+.item-btn:active{transform:scale(0.95)}
+
+.banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(30,20,14,0.95);border:2px solid #f59e0b;border-radius:16px;padding:22px 28px;text-align:center;z-index:20;min-width:260px;max-width:88vw}
+.banner .big{font-size:34px;font-weight:900;color:#f59e0b}
+.banner .label{font-size:12px;color:#fbbf24;letter-spacing:2px;text-transform:uppercase;font-family:system-ui,sans-serif;margin-bottom:6px}
+.banner .small{font-size:13px;color:#d6d3d1;margin-top:8px;line-height:1.6}
+.banner .stats{display:flex;justify-content:space-around;margin:12px 0;gap:14px}
+.banner .stats div{font-size:10px;color:#fbbf24;letter-spacing:1px}
+.banner .stats div b{display:block;font-size:20px;color:#fef3c7;font-weight:900;margin-top:2px}
+.banner button{margin-top:12px;background:#f59e0b;color:#1c1917;border:none;padding:10px 28px;border-radius:8px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit}
 .hidden{display:none !important}
-.lang-switch{position:fixed;top:14px;right:14px;display:flex;gap:2px;background:rgba(22,17,17,0.9);border:1px solid #fb7185;border-radius:8px;padding:3px;z-index:10}
-.lang-btn{background:transparent;border:none;color:#7d8590;font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;cursor:pointer;font-family:system-ui,sans-serif}
-.lang-btn.active{background:#fb7185;color:#1a0a0a}
-.foot{position:fixed;bottom:6px;right:10px;font-size:10px;color:#7d8590;font-family:system-ui,sans-serif;z-index:5}
-.foot a{color:#fda4af;text-decoration:none}
-.timer-bar{position:fixed;top:60px;left:50%;transform:translateX(-50%);width:240px;height:6px;background:rgba(251,113,133,0.15);border:1px solid #fb7185;border-radius:3px;overflow:hidden;z-index:5}
-.timer-bar-fill{height:100%;background:linear-gradient(90deg,#fb7185,#facc15);width:100%;transition:width .25s}
-.timer-bar-label{position:fixed;top:46px;left:50%;transform:translateX(-50%);font-size:10px;color:#fda4af;letter-spacing:2px;text-transform:uppercase;font-family:system-ui,sans-serif;z-index:5}
-.flash{position:fixed;inset:0;pointer-events:none;z-index:15;opacity:0;transition:opacity .15s}
+.lang-switch{position:fixed;top:10px;right:10px;display:flex;gap:2px;background:rgba(30,20,14,0.85);border:1px solid #92400e;border-radius:8px;padding:3px;z-index:10}
+.lang-btn{background:transparent;border:none;color:#a8a29e;font-size:11px;font-weight:600;padding:4px 8px;border-radius:5px;cursor:pointer;font-family:system-ui,sans-serif}
+.lang-btn.active{background:#f59e0b;color:#1c1917}
+.foot{position:fixed;bottom:4px;right:8px;font-size:9px;color:#78716c;font-family:system-ui,sans-serif;z-index:7}
+.foot a{color:#d97706;text-decoration:none}
+.flash{position:fixed;inset:0;pointer-events:none;z-index:15;opacity:0;transition:opacity .12s}
 </style>
 </head>
 <body>
@@ -45,17 +52,25 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0a0a;color:#fecac
     <div class="badge"><div class="lbl" data-i18n="yen">売上</div><div class="val" id="score">0¥</div></div>
     <div class="badge"><div class="lbl" data-i18n="served">捌いた</div><div class="val" id="served">0</div></div>
 </div>
-<div class="timer-bar-label" data-i18n="timeLabel">残り時間</div>
+<div class="timer-label" data-i18n="timeLabel">残り時間</div>
 <div class="timer-bar"><div class="timer-bar-fill" id="time"></div></div>
 <div class="combo" id="comboMsg"></div>
-<div class="help" id="help" data-i18n="help">客が欲しい商品を屋台からドラッグして渡そう</div>
 <div class="flash" id="flash"></div>
+
+<!-- Item selection bar -->
+<div class="item-bar hidden" id="itemBar">
+    <button class="item-btn" data-item="rice"><span class="emoji">🍚</span><span class="price">30¥</span></button>
+    <button class="item-btn" data-item="sweet"><span class="emoji">🍠</span><span class="price">20¥</span></button>
+    <button class="item-btn" data-item="cig"><span class="emoji">🚬</span><span class="price">40¥</span></button>
+    <button class="item-btn" data-item="soap"><span class="emoji">🧼</span><span class="price">25¥</span></button>
+    <button class="item-btn" data-item="candy"><span class="emoji">🍬</span><span class="price">35¥</span></button>
+</div>
 
 <!-- Start screen -->
 <div class="banner" id="startBanner">
     <div class="label" data-i18n="startLabel">ヤミイチ</div>
     <div class="big" data-i18n="startTitle">🏪 60秒チャレンジ</div>
-    <div class="small" data-i18n="startDesc">客の頭上の吹き出しを見て、正しい商品を屋台からドラッグして渡そう。<br>素早く渡すとボーナス！</div>
+    <div class="small" data-i18n="startDesc">客の吹き出しを見て、同じ商品をタップ。<br>次に客をタップして渡そう。速いとボーナス！</div>
     <button id="startBtn" data-i18n="startPlay">はじめる</button>
 </div>
 
@@ -64,9 +79,9 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0a0a;color:#fecac
     <div class="label" data-i18n="result">営業終了</div>
     <div class="big" id="bannerBig">0¥</div>
     <div class="stats">
-        <div><span class="stat-label" data-i18n="yenS">売上</span><b id="sYen">0¥</b></div>
-        <div><span class="stat-label" data-i18n="servedS">捌いた</span><b id="sServ">0</b></div>
-        <div><span class="stat-label" data-i18n="bestS">ベスト</span><b id="sBest">0¥</b></div>
+        <div><span data-i18n="yenS">売上</span><b id="sYen">0¥</b></div>
+        <div><span data-i18n="servedS">捌いた</span><b id="sServ">0</b></div>
+        <div><span data-i18n="bestS">ベスト</span><b id="sBest">0¥</b></div>
     </div>
     <div class="small" data-i18n="bannerSub">戦後闇市の屋台 — どれだけ稼げた？</div>
     <button id="restart" data-i18n="replay">もう一度</button>
@@ -81,25 +96,24 @@ html,body{width:100%;height:100%;overflow:hidden;background:#1a0a0a;color:#fecac
 <script type="importmap">{"imports":{"three":"https://unpkg.com/three@0.161.0/build/three.module.js","three/addons/":"https://unpkg.com/three@0.161.0/examples/jsm/"}}</script>
 <script type="module">
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
 let lang = 'ja';
 
 const I18N = {
-    ja:{yen:'売上',served:'捌いた',help:'客が欲しい商品を屋台からドラッグして渡そう。間違えると怒って帰る',
+    ja:{yen:'売上',served:'捌いた',timeLabel:'残り時間',
         result:'営業終了',yenS:'売上',servedS:'捌いた',bestS:'ベスト',
         bannerSub:'戦後闇市の屋台 — どれだけ稼げた？',replay:'もう一度',
-        timeLabel:'残り時間',great:'ありがと!',miss:'違う！',leave:'帰っちゃった…',rare:'速い！',
         startLabel:'ヤミイチ',startTitle:'🏪 60秒チャレンジ',
-        startDesc:'客の頭上の吹き出しを見て、正しい商品を屋台からドラッグして渡そう。<br>素早く渡すとボーナス！',
-        startPlay:'はじめる'},
-    en:{yen:'YEN',served:'SERVED',help:'Drag the right item from the stall to each customer\'s thought bubble',
+        startDesc:'客の吹き出しを見て、同じ商品をタップ。<br>次に客をタップして渡そう。速いとボーナス！',
+        startPlay:'はじめる',
+        correct:'ありがと！',wrong:'ちがう！',leave:'帰った…',quick:'速い！',selectFirst:'まず商品を選んで'},
+    en:{yen:'YEN',served:'SERVED',timeLabel:'TIME',
         result:'CLOSED',yenS:'YEN',servedS:'SERVED',bestS:'BEST',
         bannerSub:'Postwar black-market stall — how much did you earn?',replay:'Replay',
-        timeLabel:'TIME',great:'Thanks!',miss:'Wrong!',leave:'Walked off…',rare:'Quick!',
         startLabel:'YAMIICHI',startTitle:'🏪 60-Second Challenge',
-        startDesc:'Read the emoji above each customer and drag the matching item from the counter.<br>Faster = bonus!',
-        startPlay:'Start'}
+        startDesc:'See the customer\'s thought bubble, tap the matching item below.<br>Then tap the customer to deliver. Speed = bonus!',
+        startPlay:'Start',
+        correct:'Thanks!',wrong:'Wrong!',leave:'Left…',quick:'Quick!',selectFirst:'Pick an item first'}
 };
 
 // ── Audio ──
@@ -117,193 +131,181 @@ function sfxCoin(){ playTone(880, 0.1, 'sine', 0.3); setTimeout(()=>playTone(132
 function sfxBonus(){ playTone(660, 0.08, 'sine', 0.25); setTimeout(()=>playTone(990, 0.08, 'sine', 0.25), 60); setTimeout(()=>playTone(1320, 0.15, 'sine', 0.3), 120); }
 function sfxWrong(){ playTone(220, 0.2, 'sawtooth', 0.15); }
 function sfxLeave(){ playTone(300, 0.15, 'triangle', 0.12); playTone(200, 0.25, 'triangle', 0.12); }
-function sfxStart(){ playTone(440, 0.1, 'sine', 0.2); setTimeout(()=>playTone(660, 0.15, 'sine', 0.25), 100); }
-function sfxEnd(){ playTone(440, 0.2, 'sine', 0.2); setTimeout(()=>playTone(330, 0.3, 'sine', 0.2), 150); }
+function sfxSelect(){ playTone(600, 0.06, 'sine', 0.15); }
 
-// ── Flash effect ──
 const flashEl = document.getElementById('flash');
 function screenFlash(color){
     flashEl.style.background = color;
-    flashEl.style.opacity = '0.35';
-    setTimeout(()=>{ flashEl.style.opacity = '0'; }, 120);
+    flashEl.style.opacity = '0.3';
+    setTimeout(()=>{ flashEl.style.opacity = '0'; }, 100);
 }
 
+// ── Three.js setup ──
 const canvas = document.getElementById('scene');
 const renderer = new THREE.WebGLRenderer({canvas, antialias:true});
-renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 renderer.setSize(window.innerWidth, window.innerHeight);
 renderer.shadowMap.enabled = true;
 
 const scene = new THREE.Scene();
-scene.background = new THREE.Color('#1a0a0a');
-scene.fog = new THREE.Fog('#3f1d1d', 14, 38);
+scene.background = new THREE.Color('#8b6e5a');
+scene.fog = new THREE.Fog('#8b6e5a', 18, 40);
 
-const camera = new THREE.PerspectiveCamera(50, window.innerWidth/window.innerHeight, 0.1, 200);
-camera.position.set(0, 3.6, 7.0);
-camera.lookAt(0, 1.0, -1);
+const isMobile = window.innerWidth < 600;
+const camera = new THREE.PerspectiveCamera(isMobile ? 55 : 50, window.innerWidth / window.innerHeight, 0.1, 200);
+camera.position.set(0, isMobile ? 4.5 : 4.0, isMobile ? 6.0 : 7.0);
+camera.lookAt(0, 0.8, 0);
 
-scene.add(new THREE.HemisphereLight(0xffd0a0, 0x402015, 0.55));
-const sun = new THREE.DirectionalLight(0xffe0b0, 1.1);
-sun.position.set(4, 10, 6); sun.castShadow = true;
+// Bright warm lighting
+scene.add(new THREE.AmbientLight(0xfff5e0, 0.6));
+const hemi = new THREE.HemisphereLight(0xffeedd, 0x886644, 0.7);
+scene.add(hemi);
+const sun = new THREE.DirectionalLight(0xffe8c0, 1.8);
+sun.position.set(5, 12, 8); sun.castShadow = true;
 sun.shadow.mapSize.set(1024, 1024);
 sun.shadow.camera.left = -10; sun.shadow.camera.right = 10;
 sun.shadow.camera.top = 10; sun.shadow.camera.bottom = -10;
 scene.add(sun);
-const lampLight = new THREE.PointLight(0xffaa55, 1.5, 12);
-lampLight.position.set(0, 3.0, 0); scene.add(lampLight);
+const lampLight = new THREE.PointLight(0xffcc66, 2.5, 15);
+lampLight.position.set(0, 3.0, 0.5); scene.add(lampLight);
 
+// Ground — warm sandy dirt
 const ground = new THREE.Mesh(
     new THREE.PlaneGeometry(50, 50),
-    new THREE.MeshStandardMaterial({color:'#3a2520', roughness:0.95})
+    new THREE.MeshStandardMaterial({color:'#a08060', roughness:0.9})
 );
-ground.rotation.x = -Math.PI/2; ground.receiveShadow = true; scene.add(ground);
+ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
 
-const backdrop = new THREE.Mesh(
-    new THREE.PlaneGeometry(40, 8),
-    new THREE.MeshStandardMaterial({color:'#2a1812', roughness:0.95})
-);
-backdrop.position.set(0, 4, -8); scene.add(backdrop);
+// Stall counter (bright wood)
+const woodMat = new THREE.MeshStandardMaterial({color:'#c4956a', roughness:0.7});
+const counter = new THREE.Mesh(new THREE.BoxGeometry(4.5, 0.8, 1.0), woodMat);
+counter.position.set(0, 0.4, -0.2); counter.castShadow = true; counter.receiveShadow = true;
+scene.add(counter);
 
-let stallP, itemRice, itemSP, itemCig, itemSoap, itemCandy, custA, custB, custC, coinP;
-let ready = false;
-
-function makeProto(root, key){
-    let f = null;
-    root.traverse(o => { if(!f && o.isMesh && o.name && o.name.startsWith(key)) f = o; });
-    if(!f) return null;
-    const g = new THREE.Group();
-    const c = f.clone();
-    if(c.material) c.material = c.material.clone();
-    c.position.set(0,0,0); c.rotation.set(0,0,0);
-    c.castShadow = true; c.receiveShadow = true;
-    g.add(c); return g;
+// Stall roof
+const roofMat = new THREE.MeshStandardMaterial({color:'#8b5e3c', roughness:0.8});
+const roof = new THREE.Mesh(new THREE.BoxGeometry(5.0, 0.08, 1.8), roofMat);
+roof.position.set(0, 2.2, -0.3); roof.rotation.x = -0.15;
+roof.castShadow = true; scene.add(roof);
+// Poles
+for(const x of [-2.2, 2.2]){
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 2.2, 8), woodMat);
+    pole.position.set(x, 1.1, -0.8); pole.castShadow = true; scene.add(pole);
 }
 
-new GLTFLoader().load('scene.glb', (g) => {
-    g.scene.traverse(o => { if(o.isMesh){ o.castShadow = true; o.receiveShadow = true; }});
-    stallP    = makeProto(g.scene, 'stall');
-    itemRice  = makeProto(g.scene, 'item_rice');
-    itemSP    = makeProto(g.scene, 'item_sweetpotato');
-    itemCig   = makeProto(g.scene, 'item_cig');
-    itemSoap  = makeProto(g.scene, 'item_soap');
-    itemCandy = makeProto(g.scene, 'item_candy');
-    custA     = makeProto(g.scene, 'customer_a');
-    custB     = makeProto(g.scene, 'customer_b');
-    custC     = makeProto(g.scene, 'customer_c');
-    coinP     = makeProto(g.scene, 'coin');
-    initStall(); placeItems();
-    ready = true;
-}, undefined, () => { ready = true; });
+// Backdrop — simple wall
+const wall = new THREE.Mesh(
+    new THREE.PlaneGeometry(30, 6),
+    new THREE.MeshStandardMaterial({color:'#7a6050', roughness:0.95})
+);
+wall.position.set(0, 3, -4); scene.add(wall);
 
+// Items on counter (visible colored objects with labels)
 const ITEMS = [
-    {key:'rice',  proto:null, label:'米',  emoji:'🍚', price:30, x:-1.0},
-    {key:'sweet', proto:null, label:'芋',  emoji:'🍠', price:20, x:-0.5},
-    {key:'cig',   proto:null, label:'煙草',emoji:'🚬', price:40, x: 0.0},
-    {key:'soap',  proto:null, label:'石鹸',emoji:'🧼', price:25, x: 0.5},
-    {key:'candy', proto:null, label:'飴',  emoji:'🍬', price:35, x: 1.0},
+    {key:'rice',  emoji:'🍚', price:30, x:-1.4, color:0xf5f5dc},
+    {key:'sweet', emoji:'🍠', price:20, x:-0.7, color:0xd2691e},
+    {key:'cig',   emoji:'🚬', price:40, x: 0.0, color:0x8b8b7a},
+    {key:'soap',  emoji:'🧼', price:25, x: 0.7, color:0x87ceeb},
+    {key:'candy', emoji:'🍬', price:35, x: 1.4, color:0xff6b6b},
 ];
 
-function initStall(){
-    if(!stallP) return;
-    const s = stallP.clone(true);
-    s.position.set(0, 0, 0);
-    scene.add(s);
+// Place colored cubes on counter as visual items
+for(const it of ITEMS){
+    const mat = new THREE.MeshStandardMaterial({color: it.color, roughness:0.4});
+    const mesh = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.35, 0.35), mat);
+    mesh.position.set(it.x, 1.05, -0.2);
+    mesh.castShadow = true;
+    scene.add(mesh);
+    it.mesh = mesh;
 }
 
-const itemMeshes = {};
-function placeItems(){
-    ITEMS[0].proto = itemRice;
-    ITEMS[1].proto = itemSP;
-    ITEMS[2].proto = itemCig;
-    ITEMS[3].proto = itemSoap;
-    ITEMS[4].proto = itemCandy;
-    for(const it of ITEMS){
-        if(!it.proto) continue;
-        const m = it.proto.clone(true);
-        m.position.set(it.x, 0.55, 0);
-        m.userData = { kind:'item', key: it.key, basePos: m.position.clone() };
-        scene.add(m);
-        itemMeshes[it.key] = m;
-    }
-}
-
-const STATE = { yen:0, served:0, time:60, running:false, t:0, gameOver:false };
+// ── Customers ──
+const CUST_COLORS = [0xd97706, 0x059669, 0x7c3aed, 0xdc2626];
+const CUST_SLOTS = [-1.8, -0.6, 0.6, 1.8];
+const slotOcc = [false, false, false, false];
 let customers = [];
-let coinAnims = [];
 
-function makeOrderSprite(emoji){
+function makeCustomerMesh(){
+    const color = CUST_COLORS[Math.floor(Math.random() * CUST_COLORS.length)];
+    const g = new THREE.Group();
+    // Body
+    const body = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.25, 0.3, 0.8, 8),
+        new THREE.MeshStandardMaterial({color, roughness:0.5})
+    );
+    body.position.y = 0.4; body.castShadow = true; g.add(body);
+    // Head
+    const head = new THREE.Mesh(
+        new THREE.SphereGeometry(0.22, 12, 8),
+        new THREE.MeshStandardMaterial({color:0xfcd5b4, roughness:0.5})
+    );
+    head.position.y = 1.0; head.castShadow = true; g.add(head);
+    return g;
+}
+
+function makeBubbleSprite(emoji){
     const c = document.createElement('canvas');
     c.width = 128; c.height = 128;
     const ctx = c.getContext('2d');
-    ctx.fillStyle = 'rgba(255,255,255,0.95)';
-    ctx.beginPath(); ctx.arc(64, 56, 50, 0, Math.PI*2); ctx.fill();
-    ctx.beginPath(); ctx.moveTo(46,98); ctx.lineTo(64,118); ctx.lineTo(82,98); ctx.fill();
-    ctx.font = '64px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+    ctx.fillStyle = '#ffffff';
+    ctx.beginPath(); ctx.arc(64, 52, 48, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.moveTo(50, 92); ctx.lineTo(64, 112); ctx.lineTo(78, 92); ctx.fill();
+    ctx.strokeStyle = '#92400e'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(64, 52, 48, 0, Math.PI * 2); ctx.stroke();
+    ctx.font = '56px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
     ctx.fillStyle = '#000';
-    ctx.fillText(emoji, 64, 60);
+    ctx.fillText(emoji, 64, 52);
     const tex = new THREE.CanvasTexture(c);
     tex.colorSpace = THREE.SRGBColorSpace;
-    const mat = new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false});
-    const sp = new THREE.Sprite(mat);
-    sp.scale.set(0.9, 0.9, 1);
+    const sp = new THREE.Sprite(new THREE.SpriteMaterial({map:tex, transparent:true, depthTest:false, depthWrite:false}));
+    sp.scale.set(1.1, 1.1, 1);
     return sp;
 }
-
-function spawnCoinAnim(pos){
-    if(!coinP) return;
-    const c = coinP.clone(true);
-    c.position.copy(pos);
-    c.position.y = 1.2;
-    scene.add(c);
-    coinAnims.push({ mesh: c, life: 0 });
-}
-
-const CUST_SLOTS = [-2.0, -0.7, 0.7, 2.0];
-const slotOcc = [false, false, false, false];
 
 function spawnCustomer(){
     const free = slotOcc.map((o,i) => o ? -1 : i).filter(i => i >= 0);
     if(free.length === 0) return;
     const slot = free[Math.floor(Math.random() * free.length)];
     slotOcc[slot] = true;
-    const protoArr = [custA, custB, custC].filter(p => p);
-    if(protoArr.length === 0) return;
-    const proto = protoArr[Math.floor(Math.random() * protoArr.length)];
-    const root = proto.clone(true);
+    const root = makeCustomerMesh();
     root.position.set(CUST_SLOTS[slot], 0, 2.0);
-    root.rotation.y = 0;
     const want = ITEMS[Math.floor(Math.random() * ITEMS.length)];
-    const sprite = makeOrderSprite(want.emoji);
-    sprite.position.set(0, 1.95, 0);
-    root.add(sprite);
+    const bubble = makeBubbleSprite(want.emoji);
+    bubble.position.set(0, 1.7, 0);
+    root.add(bubble);
     scene.add(root);
-    customers.push({ root, want: want.key, sprite, slot, life: 0, leaveAt: 6.5 + Math.random()*1.5, isLeaving: false });
+    customers.push({ root, want: want.key, bubble, slot, life:0, leaveAt: 6.5 + Math.random()*2, isLeaving:false });
 }
+
+// ── Game state ──
+const STATE = { yen:0, served:0, time:60, running:false, t:0 };
+let selectedItem = null;
+let spawnT = 0;
 
 function showCombo(t){
     const c = document.getElementById('comboMsg');
     c.textContent = t; c.classList.add('show');
-    clearTimeout(c._h); c._h = setTimeout(() => c.classList.remove('show'), 600);
+    clearTimeout(c._h); c._h = setTimeout(() => c.classList.remove('show'), 700);
 }
 
 function startGame(){
     if(audioCtx.state === 'suspended') audioCtx.resume();
-    sfxStart();
-    STATE.yen = 0; STATE.served = 0; STATE.time = 60; STATE.running = true; STATE.gameOver = false; STATE.t = 0;
+    STATE.yen = 0; STATE.served = 0; STATE.time = 60; STATE.running = true; STATE.t = 0;
+    selectedItem = null;
     document.getElementById('score').textContent = '0¥';
     document.getElementById('served').textContent = '0';
     document.getElementById('time').style.width = '100%';
     document.getElementById('banner').classList.add('hidden');
     document.getElementById('startBanner').classList.add('hidden');
+    document.getElementById('itemBar').classList.remove('hidden');
+    document.querySelectorAll('.item-btn').forEach(b => b.classList.remove('selected'));
     customers.forEach(c => scene.remove(c.root)); customers = [];
-    coinAnims.forEach(c => scene.remove(c.mesh)); coinAnims = [];
     slotOcc.fill(false);
     spawnT = 0;
 }
 
 function endGame(){
-    STATE.running = false; STATE.gameOver = true;
-    sfxEnd();
+    STATE.running = false;
     let best = STATE.yen;
     try { best = Math.max(STATE.yen, +(localStorage.getItem('ya-best')||0)); localStorage.setItem('ya-best', best); } catch(e){}
     document.getElementById('bannerBig').textContent = STATE.yen + '¥';
@@ -311,164 +313,164 @@ function endGame(){
     document.getElementById('sServ').textContent = STATE.served;
     document.getElementById('sBest').textContent = best + '¥';
     document.getElementById('banner').classList.remove('hidden');
+    document.getElementById('itemBar').classList.add('hidden');
 }
 
 document.getElementById('restart').addEventListener('click', startGame);
 document.getElementById('startBtn').addEventListener('click', startGame);
 
-// ── Drag interaction ──
+// ── Item selection (tap item button) ──
+document.querySelectorAll('.item-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        if(!STATE.running) return;
+        sfxSelect();
+        selectedItem = btn.dataset.item;
+        document.querySelectorAll('.item-btn').forEach(b => b.classList.toggle('selected', b === btn));
+    });
+});
+
+// ── Customer tap (deliver item) ──
 const raycaster = new THREE.Raycaster();
 const pointer = new THREE.Vector2();
-let dragging = null;
-let dragOrigin = null;
 
-function getPointer(ev){
-    const r = canvas.getBoundingClientRect();
-    const src = ev.touches ? ev.touches[0] : ev;
-    if(!src) return;
-    const x = src.clientX - r.left;
-    const y = src.clientY - r.top;
-    pointer.x = (x / r.width) * 2 - 1;
-    pointer.y = -(y / r.height) * 2 + 1;
-}
-
-function pointerToWorld(ev){
-    getPointer(ev);
-    raycaster.setFromCamera(pointer, camera);
-    const plane = new THREE.Plane(new THREE.Vector3(0,1,0), -0.6);
-    const target = new THREE.Vector3();
-    raycaster.ray.intersectPlane(plane, target);
-    return target;
-}
-
-function onDown(ev){
+function onTapScene(ev){
     if(!STATE.running) return;
     if(audioCtx.state === 'suspended') audioCtx.resume();
-    getPointer(ev);
+
+    const r = canvas.getBoundingClientRect();
+    const src = ev.changedTouches ? ev.changedTouches[0] : ev;
+    pointer.x = ((src.clientX - r.left) / r.width) * 2 - 1;
+    pointer.y = -((src.clientY - r.top) / r.height) * 2 + 1;
     raycaster.setFromCamera(pointer, camera);
-    const itemList = Object.values(itemMeshes);
-    const hits = raycaster.intersectObjects(itemList, true);
-    if(hits.length){
-        let root = hits[0].object;
-        while(root.parent && !itemList.includes(root)) root = root.parent;
-        dragging = root;
-        dragOrigin = root.position.clone();
-        canvas.classList.add('dragging');
-    }
-}
 
-function onMove(ev){
-    if(!dragging) return;
-    if(ev.touches) ev.preventDefault();
-    const t = pointerToWorld(ev);
-    if(t){ dragging.position.x = t.x; dragging.position.z = Math.min(2.4, t.z); dragging.position.y = 0.8; }
-}
-
-function onUp(){
-    if(!dragging) return;
-    canvas.classList.remove('dragging');
-    let best = null, bestD = 1.2;
+    let bestCust = null, bestDist = Infinity;
     for(const c of customers){
-        const dx = c.root.position.x - dragging.position.x;
-        const dz = c.root.position.z - dragging.position.z;
-        const d = Math.hypot(dx, dz);
-        if(d < bestD && !c.isLeaving){ best = c; bestD = d; }
-    }
-    if(best){
-        const itemKey = dragging.userData.key;
-        if(itemKey === best.want){
-            const it = ITEMS.find(i => i.key === itemKey);
-            const bonus = best.life < 3 ? 1.5 : 1;
-            const earn = Math.floor(it.price * bonus);
-            STATE.yen += earn; STATE.served += 1;
-            document.getElementById('score').textContent = STATE.yen + '¥';
-            document.getElementById('served').textContent = STATE.served;
-            const msg = '+' + earn + (bonus > 1 ? ' ' + I18N[lang].rare : '') + ' ¥';
-            showCombo(msg);
-            spawnCoinAnim(best.root.position);
-            screenFlash('#facc15');
-            if(bonus > 1) sfxBonus(); else sfxCoin();
-            best.isLeaving = true; best.leaveDir = (Math.random() < 0.5 ? -1 : 1) * 4;
-        } else {
-            showCombo(I18N[lang].miss);
-            screenFlash('#ef4444');
-            sfxWrong();
-            best.life += 1.5;
+        if(c.isLeaving) continue;
+        const hits = raycaster.intersectObjects(c.root.children, true);
+        if(hits.length && hits[0].distance < bestDist){
+            bestCust = c; bestDist = hits[0].distance;
         }
     }
-    dragging.position.copy(dragOrigin);
-    dragging = null;
+
+    if(!bestCust){
+        // check if tapped near a customer by proximity
+        for(const c of customers){
+            if(c.isLeaving) continue;
+            const screenPos = c.root.position.clone().project(camera);
+            const dx = screenPos.x - pointer.x;
+            const dy = screenPos.y - pointer.y;
+            const d = Math.hypot(dx, dy);
+            if(d < 0.25 && d < bestDist){ bestCust = c; bestDist = d; }
+        }
+    }
+
+    if(!bestCust) return;
+
+    if(!selectedItem){
+        showCombo(I18N[lang].selectFirst);
+        return;
+    }
+
+    if(selectedItem === bestCust.want){
+        const it = ITEMS.find(i => i.key === selectedItem);
+        const bonus = bestCust.life < 3 ? 1.5 : 1;
+        const earn = Math.floor(it.price * bonus);
+        STATE.yen += earn; STATE.served += 1;
+        document.getElementById('score').textContent = STATE.yen + '¥';
+        document.getElementById('served').textContent = STATE.served;
+        const msg = '+' + earn + (bonus > 1 ? ' ' + I18N[lang].quick : '') + '¥';
+        showCombo(msg);
+        screenFlash('#facc15');
+        if(bonus > 1) sfxBonus(); else sfxCoin();
+        bestCust.isLeaving = true;
+        bestCust.leaveDir = (Math.random() < 0.5 ? -1 : 1) * 3;
+    } else {
+        showCombo(I18N[lang].wrong);
+        screenFlash('#ef4444');
+        sfxWrong();
+        bestCust.life += 1.5;
+        // shake customer
+        bestCust._shakeT = 0.3;
+    }
+
+    selectedItem = null;
+    document.querySelectorAll('.item-btn').forEach(b => b.classList.remove('selected'));
 }
 
-canvas.addEventListener('mousedown', onDown);
-canvas.addEventListener('mousemove', onMove);
-canvas.addEventListener('mouseup', onUp);
-canvas.addEventListener('mouseleave', onUp);
-canvas.addEventListener('touchstart', onDown, {passive:false});
-canvas.addEventListener('touchmove', onMove, {passive:false});
-canvas.addEventListener('touchend', onUp, {passive:false});
+canvas.addEventListener('click', onTapScene);
+canvas.addEventListener('touchend', (ev) => {
+    ev.preventDefault();
+    onTapScene(ev);
+}, {passive:false});
 
+// ── Animation loop ──
 const clock = new THREE.Clock();
-let spawnT = 0;
 
 function animate(){
     requestAnimationFrame(animate);
     const dt = Math.min(clock.getDelta(), 0.05);
-    if(!ready){ renderer.render(scene, camera); return; }
     STATE.t += dt;
 
-    lampLight.intensity = 1.4 + Math.sin(STATE.t * 5) * 0.3;
+    lampLight.intensity = 2.3 + Math.sin(STATE.t * 4) * 0.4;
+
+    // Rotate items on counter
+    for(const it of ITEMS){
+        if(it.mesh) it.mesh.rotation.y += dt * 0.8;
+    }
 
     if(STATE.running){
         STATE.time -= dt;
         document.getElementById('time').style.width = Math.max(0, STATE.time / 60 * 100) + '%';
-        if(STATE.time <= 0){ endGame(); }
+        if(STATE.time <= 0) endGame();
 
         spawnT -= dt;
-        const interval = Math.max(1.2, 2.5 - STATE.served * 0.05);
+        const interval = Math.max(1.0, 2.5 - STATE.served * 0.06);
         if(spawnT <= 0){ spawnT = interval; spawnCustomer(); }
 
         for(let i = customers.length - 1; i >= 0; i--){
             const c = customers[i];
             c.life += dt;
+
             if(c.isLeaving){
                 c.root.position.x += c.leaveDir * dt;
-                c.root.rotation.y = c.leaveDir > 0 ? Math.PI/2 : -Math.PI/2;
-                if(Math.abs(c.root.position.x) > 8){
+                c.root.rotation.y = c.leaveDir > 0 ? Math.PI / 3 : -Math.PI / 3;
+                if(Math.abs(c.root.position.x) > 6){
                     scene.remove(c.root); slotOcc[c.slot] = false; customers.splice(i, 1);
                 }
                 continue;
             }
-            c.root.position.y = Math.sin(STATE.t * 3 + i) * 0.04;
+
+            // Bob
+            c.root.position.y = Math.sin(STATE.t * 2.5 + i * 1.5) * 0.03;
+
+            // Shake on wrong delivery
+            if(c._shakeT && c._shakeT > 0){
+                c._shakeT -= dt;
+                c.root.position.x = CUST_SLOTS[c.slot] + Math.sin(STATE.t * 40) * 0.06;
+            } else {
+                c.root.position.x = CUST_SLOTS[c.slot];
+            }
+
+            // Patience warning — bubble shakes
             const remaining = c.leaveAt - c.life;
             if(remaining < 2.0){
-                c.sprite.position.x = Math.sin(STATE.t * 20) * 0.04;
+                c.bubble.position.x = Math.sin(STATE.t * 18) * 0.06;
+                c.bubble.material.color.setHex(remaining < 1.0 ? 0xff6666 : 0xffcc66);
             }
+
             if(c.life > c.leaveAt){
                 showCombo(I18N[lang].leave);
                 sfxLeave();
-                c.isLeaving = true; c.leaveDir = (Math.random() < 0.5 ? -1 : 1) * 4;
+                c.isLeaving = true;
+                c.leaveDir = (Math.random() < 0.5 ? -1 : 1) * 3;
                 STATE.yen = Math.max(0, STATE.yen - 5);
                 document.getElementById('score').textContent = STATE.yen + '¥';
             }
         }
     }
 
-    // coin animations
-    for(let i = coinAnims.length - 1; i >= 0; i--){
-        const ca = coinAnims[i];
-        ca.life += dt;
-        ca.mesh.position.y += dt * 2.5;
-        ca.mesh.rotation.y += dt * 8;
-        const scale = Math.max(0, 1 - ca.life * 1.5);
-        ca.mesh.scale.setScalar(scale);
-        if(ca.life > 0.7){
-            scene.remove(ca.mesh); coinAnims.splice(i, 1);
-        }
-    }
-
-    camera.position.x = Math.sin(STATE.t * 0.15) * 0.25;
-    camera.lookAt(0, 1.0, -1);
+    camera.position.x = Math.sin(STATE.t * 0.12) * 0.15;
+    camera.lookAt(0, 0.8, 0);
 
     renderer.render(scene, camera);
 }
@@ -476,7 +478,8 @@ animate();
 
 window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight; camera.updateProjectionMatrix();
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
 });
 
 function applyLang(){
@@ -485,15 +488,8 @@ function applyLang(){
     document.querySelectorAll('[data-i18n]').forEach(el => {
         const k = el.getAttribute('data-i18n');
         if(dict[k] == null) return;
-        if(k === 'startDesc'){
-            el.innerHTML = dict[k];
-        } else if(el.querySelector('b')){
-            const b = el.querySelector('b');
-            const bContent = b.textContent;
-            el.childNodes[0].textContent = dict[k];
-        } else {
-            el.textContent = dict[k];
-        }
+        if(k === 'startDesc') el.innerHTML = dict[k];
+        else el.textContent = dict[k];
     });
 }
 document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', () => {
@@ -502,10 +498,6 @@ document.querySelectorAll('.lang-btn').forEach(b => b.addEventListener('click', 
     applyLang();
 }));
 applyLang();
-
-const checkReady = setInterval(() => {
-    if(ready){ clearInterval(checkReady); }
-}, 100);
 </script>
 </body>
 </html>
